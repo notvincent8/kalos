@@ -13,8 +13,8 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("email", "text", (col) => col.notNull().unique())
     .addColumn("emailVerified", "boolean", (col) => col.notNull())
     .addColumn("image", "text")
-    .addColumn("createdAt", "timestamptz", (col) => col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`))
-    .addColumn("updatedAt", "timestamptz", (col) => col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`))
+    .addColumn("createdAt", "timestamptz", (col) => col.defaultTo(sql`now()`).notNull())
+    .addColumn("updatedAt", "timestamptz", (col) => col.defaultTo(sql`now()`).notNull())
     .execute()
 
   // Create session table
@@ -23,7 +23,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("id", "text", (col) => col.primaryKey().notNull())
     .addColumn("expiresAt", "timestamptz", (col) => col.notNull())
     .addColumn("token", "text", (col) => col.notNull().unique())
-    .addColumn("createdAt", "timestamptz", (col) => col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`))
+    .addColumn("createdAt", "timestamptz", (col) => col.defaultTo(sql`now()`).notNull())
     .addColumn("updatedAt", "timestamptz", (col) => col.notNull())
     .addColumn("ipAddress", "text")
     .addColumn("userAgent", "text")
@@ -44,7 +44,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("refreshTokenExpiresAt", "timestamptz")
     .addColumn("scope", "text")
     .addColumn("password", "text")
-    .addColumn("createdAt", "timestamptz", (col) => col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`))
+    .addColumn("createdAt", "timestamptz", (col) => col.defaultTo(sql`now()`).notNull())
     .addColumn("updatedAt", "timestamptz", (col) => col.notNull())
     .execute()
 
@@ -55,8 +55,8 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("identifier", "text", (col) => col.notNull())
     .addColumn("value", "text", (col) => col.notNull())
     .addColumn("expiresAt", "timestamptz", (col) => col.notNull())
-    .addColumn("createdAt", "timestamptz", (col) => col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`))
-    .addColumn("updatedAt", "timestamptz", (col) => col.notNull().defaultTo(sql`CURRENT_TIMESTAMP`))
+    .addColumn("createdAt", "timestamptz", (col) => col.defaultTo(sql`now()`).notNull())
+    .addColumn("updatedAt", "timestamptz", (col) => col.defaultTo(sql`now()`).notNull())
     .execute()
 
   // Create indexes
