@@ -4,11 +4,7 @@ import type { Database } from "@/lib/db-types"
 
 const dialect = new PostgresDialect({
   pool: new Pool({
-    database: "test",
-    host: "localhost",
-    user: "admin",
-    port: 5434,
-    max: 10,
+    connectionString: process.env.DATABASE_URL,
   }),
 })
 
