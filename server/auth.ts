@@ -6,4 +6,16 @@ export const auth = betterAuth({
     db,
     type: "postgres",
   },
+  trustedOrigins: [process.env.BETTER_AUTH_URL || "http://localhost:3000"],
+  rateLimit: {
+    enabled: true,
+    window: 60, // time in seconds
+    maxRequests: 100, // max requests per window
+  },
+  advanced: {
+    cookiePrefix: "kalos-auth",
+    database: {
+      generateId: "uuid",
+    },
+  },
 })
