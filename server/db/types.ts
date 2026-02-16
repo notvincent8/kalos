@@ -3,10 +3,7 @@
  * Please do not edit it manually.
  */
 
-import type { ColumnType } from "kysely"
-
-export type Generated<T> =
-  T extends ColumnType<infer S, infer I, infer U> ? ColumnType<S, I | undefined, U> : ColumnType<T, T | undefined, T>
+import type { ColumnType, Generated } from "kysely"
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>
 
@@ -15,7 +12,7 @@ export interface Account {
   accessTokenExpiresAt: Timestamp | null
   accountId: string
   createdAt: Generated<Timestamp>
-  id: string
+  id: Generated<string>
   idToken: string | null
   password: string | null
   providerId: string
@@ -29,7 +26,7 @@ export interface Account {
 export interface Session {
   createdAt: Generated<Timestamp>
   expiresAt: Timestamp
-  id: string
+  id: Generated<string>
   ipAddress: string | null
   token: string
   updatedAt: Timestamp
@@ -41,7 +38,7 @@ export interface User {
   createdAt: Generated<Timestamp>
   email: string
   emailVerified: boolean
-  id: string
+  id: Generated<string>
   image: string | null
   name: string
   updatedAt: Generated<Timestamp>
@@ -50,7 +47,7 @@ export interface User {
 export interface Verification {
   createdAt: Generated<Timestamp>
   expiresAt: Timestamp
-  id: string
+  id: Generated<string>
   identifier: string
   updatedAt: Generated<Timestamp>
   value: string
