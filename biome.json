@@ -7,7 +7,16 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!node_modules", "!.next", "!dist", "!build", "!.claude", "!tsconfig*.json"]
+    "includes": [
+      "**",
+      "!node_modules",
+      "!.next",
+      "!dist",
+      "!build",
+      "!.claude",
+      "!tsconfig*.json",
+      "!app/components/ui"
+    ]
   },
   "formatter": {
     "enabled": true,
