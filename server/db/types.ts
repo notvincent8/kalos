@@ -3,65 +3,64 @@
  * Please do not edit it manually.
  */
 
-import type { ColumnType } from "kysely";
+import type { ColumnType } from "kysely"
 
-export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
-  ? ColumnType<S, I | undefined, U>
-  : ColumnType<T, T | undefined, T>;
+export type Generated<T> =
+  T extends ColumnType<infer S, infer I, infer U> ? ColumnType<S, I | undefined, U> : ColumnType<T, T | undefined, T>
 
-export type Timestamp = ColumnType<Date, Date | string, Date | string>;
+export type Timestamp = ColumnType<Date, Date | string, Date | string>
 
 export interface Account {
-  accessToken: string | null;
-  accessTokenExpiresAt: Timestamp | null;
-  accountId: string;
-  createdAt: Generated<Timestamp>;
-  id: Generated<string>;
-  idToken: string | null;
-  password: string | null;
-  providerId: string;
-  refreshToken: string | null;
-  refreshTokenExpiresAt: Timestamp | null;
-  scope: string | null;
-  updatedAt: Timestamp;
-  userId: string;
+  accessToken: string | null
+  accessTokenExpiresAt: Timestamp | null
+  accountId: string
+  createdAt: Generated<Timestamp>
+  id: Generated<string>
+  idToken: string | null
+  password: string | null
+  providerId: string
+  refreshToken: string | null
+  refreshTokenExpiresAt: Timestamp | null
+  scope: string | null
+  updatedAt: Timestamp
+  userId: string
 }
 
 export interface Session {
-  createdAt: Generated<Timestamp>;
-  expiresAt: Timestamp;
-  id: Generated<string>;
-  ipAddress: string | null;
-  token: string;
-  updatedAt: Timestamp;
-  userAgent: string | null;
-  userId: string;
+  createdAt: Generated<Timestamp>
+  expiresAt: Timestamp
+  id: Generated<string>
+  ipAddress: string | null
+  token: string
+  updatedAt: Timestamp
+  userAgent: string | null
+  userId: string
 }
 
 export interface User {
-  createdAt: Generated<Timestamp>;
-  displayUsername: string | null;
-  email: string;
-  emailVerified: boolean;
-  id: Generated<string>;
-  image: string | null;
-  name: string;
-  updatedAt: Generated<Timestamp>;
-  username: string;
+  createdAt: Generated<Timestamp>
+  displayUsername: string | null
+  email: string
+  emailVerified: boolean
+  id: Generated<string>
+  image: string | null
+  name: string
+  updatedAt: Generated<Timestamp>
+  username: string
 }
 
 export interface Verification {
-  createdAt: Generated<Timestamp>;
-  expiresAt: Timestamp;
-  id: Generated<string>;
-  identifier: string;
-  updatedAt: Generated<Timestamp>;
-  value: string;
+  createdAt: Generated<Timestamp>
+  expiresAt: Timestamp
+  id: Generated<string>
+  identifier: string
+  updatedAt: Generated<Timestamp>
+  value: string
 }
 
 export interface DB {
-  account: Account;
-  session: Session;
-  user: User;
-  verification: Verification;
+  account: Account
+  session: Session
+  user: User
+  verification: Verification
 }
