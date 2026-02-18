@@ -3,45 +3,16 @@
 import { useRouter } from "next/navigation"
 import { type SyntheticEvent, useState, useTransition } from "react"
 import { z } from "zod"
-import { registerFormSchema } from "@/app/(auth)/register/registerForm.schema"
+import { registerFormSchema } from "@/app/(auth)/auth.schema"
+import { type FieldErrors, formatAuthError, getAndFormatFirstError } from "@/app/(auth)/authUtils"
 import { Button } from "@/app/components/ui/button"
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/app/components/ui/field"
 import { Input } from "@/app/components/ui/input"
 import { Spinner } from "@/app/components/ui/spinner"
 import { signUp } from "@/lib/auth-client"
 
-type FieldErrors = {
-  name?: string[]
-  username?: string[]
-  email?: string[]
-  password?: string[]
-  root?: string[]
-}
-
-type AuthError = {
-  code?: string | undefined
-  message?: string | undefined
-  status: number
-  statusText: string
-}
-
-const formatAuthError = (error: AuthError): FieldErrors => {
-  switch (error.code) {
-    case "USERNAME_IS_ALREADY_TAKEN_PLEASE_TRY_ANOTHER":
-      return { username: ["This username is already taken"] }
-    case "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL":
-      return { email: ["An account with this email already exists"] }
-    default:
-      return { root: [error.message || "Something went wrong. Please try again."] }
-  }
-}
-
-const getAndFormatFirstError = (errors?: string[]): { message: string }[] | undefined => {
-  if (!errors || errors.length === 0) return
-
-  return [{ message: errors[0] }]
-}
-
+//   success: "Welcome aboard!"
+//   error:   "Try again"
 const RegisterForm = () => {
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<FieldErrors>({})
@@ -141,7 +112,7 @@ const RegisterForm = () => {
         </Field>
         <Field orientation="horizontal">
           <Button disabled={isPending} type="submit">
-            {isPending ? "Creating account..." : "Register"}
+            {isPending ? "Setting things up... " : "Sign up"}
             {isPending && <Spinner data-icon="inline-start" />}
           </Button>
         </Field>

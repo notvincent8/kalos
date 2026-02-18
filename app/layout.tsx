@@ -1,10 +1,8 @@
 import type { Metadata } from "next"
 import { Cormorant_Garamond, DM_Sans } from "next/font/google"
 import "./globals.css"
-import { headers } from "next/headers"
 import Footer from "@/app/components/Footer"
 import Header from "@/app/components/Header"
-import { auth } from "@/server/auth"
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -29,14 +27,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
-
   return (
     <html lang="en">
       <body className={`${cormorant.variable} ${dmSans.variable} antialiased`}>
-        <Header isAuthenticated={!!session} />
+        <Header />
         {children}
         <Footer />
       </body>
