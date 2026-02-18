@@ -1,19 +1,21 @@
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Cormorant_Garamond, DM_Sans } from "next/font/google"
 import "./globals.css"
 import { headers } from "next/headers"
 import Footer from "@/app/components/Footer"
 import Header from "@/app/components/Header"
 import { auth } from "@/server/auth"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const cormorant = Cormorant_Garamond({
+  variable: "--font-cormorant",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
 })
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600"],
 })
 
 export const metadata: Metadata = {
@@ -33,7 +35,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${cormorant.variable} ${dmSans.variable} antialiased`}>
         <Header isAuthenticated={!!session} />
         {children}
         <Footer />
