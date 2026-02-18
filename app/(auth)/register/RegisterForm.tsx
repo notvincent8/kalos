@@ -5,16 +5,14 @@ import { type SyntheticEvent, useState, useTransition } from "react"
 import { z } from "zod"
 import { registerFormSchema } from "@/app/(auth)/auth.schema"
 import { type FieldErrors, formatAuthError, getAndFormatFirstError } from "@/app/(auth)/authUtils"
-import { Button } from "@/app/components/ui/button"
+import SubmitButton from "@/app/(auth)/components/SubmitButton"
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/app/components/ui/field"
 import { Input } from "@/app/components/ui/input"
-import { Spinner } from "@/app/components/ui/spinner"
 import { signUp } from "@/lib/auth-client"
 
-//   success: "Welcome aboard!"
-//   error:   "Try again"
 const RegisterForm = () => {
   const [isPending, startTransition] = useTransition()
+  const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState<FieldErrors>({})
 
   const router = useRouter()
@@ -50,7 +48,7 @@ const RegisterForm = () => {
         setError(formatAuthError(error))
         return
       } else {
-        router.push("/dashboard")
+        setIsSuccess(true)
       }
     })
   }
@@ -111,10 +109,16 @@ const RegisterForm = () => {
           <FieldError errors={getAndFormatFirstError(error.password)} />
         </Field>
         <Field orientation="horizontal">
-          <Button disabled={isPending} type="submit">
-            {isPending ? "Setting things up... " : "Sign up"}
-            {isPending && <Spinner data-icon="inline-start" />}
-          </Button>
+          <SubmitButton
+            isPending={isPending}
+            isSuccess={isSuccess}
+            labels={{
+              idle: "Sign up",
+              pending: "Setting things up... ",
+              success: "Welcome aboard!",
+            }}
+            onSuccessComplete={() => router.push("/dashboard")}
+          />
         </Field>
       </FieldGroup>
     </form>
@@ -122,6 +126,3 @@ const RegisterForm = () => {
 }
 
 export default RegisterForm
-
-// TODO : - Success button animation
-//        - Guard the page so that if the user is already logged in, they get redirected to the dashboard (useSession or something like that)

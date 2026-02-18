@@ -4,22 +4,15 @@ import { useRouter } from "next/navigation"
 import { type SyntheticEvent, useState, useTransition } from "react"
 import { z } from "zod"
 import { loginFormSchema } from "@/app/(auth)/auth.schema"
-import { Button } from "@/app/components/ui/button"
+import SubmitButton from "@/app/(auth)/components/SubmitButton"
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/app/components/ui/field"
 import { Input } from "@/app/components/ui/input"
-import { Spinner } from "@/app/components/ui/spinner"
 import { signIn } from "@/lib/auth-client"
 import { type FieldErrors, formatAuthError, getAndFormatFirstError } from "../authUtils"
 
-//   success: "You're in!"
-//   error:   "Try again"
-
-// Reset form
-//  idle:    "Start over"
-//  success: "Cleared!"
-//  error:   "Couldn't clear"
 const LoginForm = () => {
   const [isPending, startTransition] = useTransition()
+  const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState<FieldErrors>({})
 
   const router = useRouter()
@@ -52,7 +45,7 @@ const LoginForm = () => {
         setError(formatAuthError(error))
         return
       } else {
-        router.push("/dashboard")
+        setIsSuccess(true)
       }
     })
   }
@@ -83,10 +76,16 @@ const LoginForm = () => {
           <FieldError errors={getAndFormatFirstError(error.password)} />
         </Field>
         <Field orientation="horizontal">
-          <Button disabled={isPending} type="submit">
-            {isPending ? "Logging in..." : "Log in"}
-            {isPending && <Spinner data-icon="inline-start" />}
-          </Button>
+          <SubmitButton
+            isPending={isPending}
+            isSuccess={isSuccess}
+            labels={{
+              idle: "Log in",
+              pending: "Logging in...",
+              success: "You're in!",
+            }}
+            onSuccessComplete={() => router.push("/dashboard")}
+          />
         </Field>
       </FieldGroup>
     </form>
