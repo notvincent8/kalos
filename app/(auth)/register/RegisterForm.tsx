@@ -28,11 +28,11 @@ type AuthError = {
 const formatAuthError = (error: AuthError): FieldErrors => {
   switch (error.code) {
     case "USERNAME_IS_ALREADY_TAKEN_PLEASE_TRY_ANOTHER":
-      return { username: ["Username is already taken, please try another"] }
+      return { username: ["This username is already taken"] }
     case "USER_ALREADY_EXISTS_USE_ANOTHER_EMAIL":
-      return { email: ["Email is already taken, please try another"] }
+      return { email: ["An account with this email already exists"] }
     default:
-      return { root: [error.message || "An unexpected error occurred. Please try again."] }
+      return { root: [error.message || "Something went wrong. Please try again."] }
   }
 }
 
