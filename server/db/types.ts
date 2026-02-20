@@ -30,6 +30,28 @@ export interface Account {
   userId: string
 }
 
+export interface Exercise {
+  categoryId: string
+  createdAt: Generated<Timestamp>
+  description: string | null
+  id: Generated<string>
+  importantNote: string | null
+  level: Numeric
+  measurementType: MeasurementType
+  name: string
+  targetNote: string | null
+  targetToUnlockNext: number | null
+  updatedAt: Generated<Timestamp>
+}
+
+export interface ExerciseCategory {
+  createdAt: Generated<Timestamp>
+  description: string | null
+  id: Generated<string>
+  name: string
+  updatedAt: Generated<Timestamp>
+}
+
 export interface Session {
   createdAt: Generated<Timestamp>
   expiresAt: Timestamp
@@ -58,6 +80,16 @@ export interface User {
   username: string
 }
 
+export interface UserExerciceProgression {
+  categoryId: string
+  createdAt: Generated<Timestamp>
+  currentExerciseId: string
+  id: Generated<string>
+  unlockedAt: Generated<Timestamp>
+  updatedAt: Generated<Timestamp>
+  userId: string
+}
+
 export interface Verification {
   createdAt: Generated<Timestamp>
   expiresAt: Timestamp
@@ -69,7 +101,10 @@ export interface Verification {
 
 export interface DB {
   account: Account
+  exercise: Exercise
+  exerciseCategory: ExerciseCategory
   session: Session
   user: User
+  userExerciceProgression: UserExerciceProgression
   verification: Verification
 }
