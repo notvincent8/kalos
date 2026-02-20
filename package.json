@@ -10,7 +10,8 @@
     "format": "biome format --write",
     "db:migrate": "kysely migrate up",
     "db:rollback": "kysely migrate down",
-    "kysely:generate": "kysely-codegen --out-file server/db/types.ts --dialect postgres",
+    "kysely:generate": "kysely-codegen",
+    "kysely:verify": "kysely-codegen --verify",
     "better-auth:migrate": "pnpm dlx @better-auth/cli@latest migrate",
     "better-auth:generate": "pnpm dlx @better-auth/cli@latest generate"
   },
