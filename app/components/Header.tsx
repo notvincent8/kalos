@@ -34,10 +34,20 @@ const Header = () => {
           </Button>
         </div>
       ) : (
-        <Button disabled={isPending} variant="outline" onClick={handleSignOut}>
-          {isPending ? "Logging out..." : "Log out"}
+        <div className="flex items-center gap-4">
+          <Link href="/dashboard" className=" flex gap-1 hover:underline items-center">
+            {session.user.role === "admin" ? (
+              <span className="text-sm">
+                <span className="text-red-500 font-extrabold">Admin</span> |
+              </span>
+            ) : null}
+            <span>{session.user.username}</span>
+          </Link>
+          <Button disabled={isPending} variant="outline" onClick={handleSignOut}>
+            {isPending ? "Logging out..." : "Log out"}
+          </Button>
           {isPending && <Spinner data-icon="inline-start" />}
-        </Button>
+        </div>
       )}
     </header>
   )

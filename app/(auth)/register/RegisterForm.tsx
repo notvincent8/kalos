@@ -126,3 +126,5 @@ const RegisterForm = () => {
 }
 
 export default RegisterForm
+
+// TODO : Check username availability on change with debounce and show feedback to user
