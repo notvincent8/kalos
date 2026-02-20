@@ -8,6 +8,10 @@ import type { ColumnType } from "kysely"
 export type Generated<T> =
   T extends ColumnType<infer S, infer I, infer U> ? ColumnType<S, I | undefined, U> : ColumnType<T, T | undefined, T>
 
+export type MeasurementType = "distance" | "duration" | "reps"
+
+export type Numeric = ColumnType<string, number | string, number | string>
+
 export type Timestamp = ColumnType<Date, Date | string, Date | string>
 
 export interface Account {
@@ -30,6 +34,7 @@ export interface Session {
   createdAt: Generated<Timestamp>
   expiresAt: Timestamp
   id: Generated<string>
+  impersonatedBy: string | null
   ipAddress: string | null
   token: string
   updatedAt: Timestamp
@@ -38,6 +43,9 @@ export interface Session {
 }
 
 export interface User {
+  banExpiresAt: Timestamp | null
+  banned: boolean | null
+  banReason: string | null
   createdAt: Generated<Timestamp>
   displayUsername: string | null
   email: string
@@ -45,6 +53,7 @@ export interface User {
   id: Generated<string>
   image: string | null
   name: string
+  role: string | null
   updatedAt: Generated<Timestamp>
   username: string
 }
