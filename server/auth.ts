@@ -6,6 +6,7 @@ export const auth = betterAuth({
   database: {
     db,
     type: "postgres",
+    casing: "snake",
   },
   trustedOrigins: [process.env.BETTER_AUTH_URL || "http://localhost:3000"],
   rateLimit: {
