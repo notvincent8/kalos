@@ -4,7 +4,7 @@ import { dialect } from "../server/db"
 export default defineConfig({
   dialect,
   migrations: {
-    migrationFolder: "../migrations",
+    migrationFolder: "../server/db/migrations",
   },
   plugins: [],
   seeds: {
