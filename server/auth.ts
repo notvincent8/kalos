@@ -1,5 +1,5 @@
 import { betterAuth } from "better-auth"
-import { username } from "better-auth/plugins"
+import { admin, username } from "better-auth/plugins"
 import { db } from "@/server/db"
 
 export const auth = betterAuth({
@@ -22,5 +22,5 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  plugins: [username()],
+  plugins: [admin(), username()],
 })
