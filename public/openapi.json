@@ -1,0 +1,1500 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Kalos Fitness API",
+    "description": "API for the Kalos fitness application - a progressive calisthenics training tracker.\n\n## Authentication\nAll endpoints require Bearer token authentication via better-auth.\n\n## Core Concepts\n- **Exercise Categories**: Groups of exercises (push-ups, pull-ups, squats, etc.)\n- **Exercises**: Individual exercises with progression levels within categories\n- **Programs**: User training plans with scheduled training days\n- **Workout Sessions**: Actual workout instances with tracked sets and reps",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Kalos Support"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Local development"
+    },
+    {
+      "url": "https://kalos.app/api",
+      "description": "Production"
+    }
+  ],
+  "tags": [
+    { "name": "Users", "description": "User management" },
+    { "name": "Exercise Categories", "description": "Exercise category management" },
+    { "name": "Exercises", "description": "Exercise management" },
+    { "name": "User Progression", "description": "User exercise progression tracking" },
+    { "name": "Programs", "description": "Training program management" },
+    { "name": "Program Exercises", "description": "Program exercise ordering" },
+    { "name": "Workout Sessions", "description": "Workout session management" },
+    { "name": "Workout Session Exercises", "description": "Exercises within a workout session" },
+    { "name": "Workout Sets", "description": "Individual set tracking" }
+  ],
+  "paths": {
+    "/users": {
+      "get": {
+        "operationId": "listUsers",
+        "summary": "List all users",
+        "description": "Returns a paginated list of users. Admin only.",
+        "tags": ["Users"],
+        "parameters": [
+          { "$ref": "#/components/parameters/PageParam" },
+          { "$ref": "#/components/parameters/LimitParam" },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Search by name, username, or email",
+            "schema": { "type": "string", "minLength": 2, "maxLength": 100 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["data", "pagination"],
+                  "properties": {
+                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/User" } },
+                    "pagination": { "$ref": "#/components/schemas/Pagination" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/users/{userId}": {
+      "parameters": [{ "$ref": "#/components/parameters/UserIdParam" }],
+      "get": {
+        "operationId": "getUser",
+        "summary": "Get user by ID",
+        "tags": ["Users"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "patch": {
+        "operationId": "updateUser",
+        "summary": "Update user",
+        "tags": ["Users"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateUserRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "delete": {
+        "operationId": "deleteUser",
+        "summary": "Delete user",
+        "tags": ["Users"],
+        "responses": {
+          "204": { "description": "User deleted" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/exercise-categories": {
+      "get": {
+        "operationId": "listExerciseCategories",
+        "summary": "List all exercise categories",
+        "tags": ["Exercise Categories"],
+        "parameters": [
+          { "$ref": "#/components/parameters/PageParam" },
+          { "$ref": "#/components/parameters/LimitParam" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["data", "pagination"],
+                  "properties": {
+                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/ExerciseCategory" } },
+                    "pagination": { "$ref": "#/components/schemas/Pagination" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "post": {
+        "operationId": "createExerciseCategory",
+        "summary": "Create exercise category",
+        "tags": ["Exercise Categories"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateExerciseCategoryRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Category created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ExerciseCategory" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "409": { "$ref": "#/components/responses/Conflict" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/exercise-categories/{categoryId}": {
+      "parameters": [{ "$ref": "#/components/parameters/CategoryIdParam" }],
+      "get": {
+        "operationId": "getExerciseCategory",
+        "summary": "Get exercise category by ID",
+        "tags": ["Exercise Categories"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ExerciseCategory" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "patch": {
+        "operationId": "updateExerciseCategory",
+        "summary": "Update exercise category",
+        "tags": ["Exercise Categories"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateExerciseCategoryRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Category updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ExerciseCategory" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "delete": {
+        "operationId": "deleteExerciseCategory",
+        "summary": "Delete exercise category",
+        "tags": ["Exercise Categories"],
+        "responses": {
+          "204": { "description": "Category deleted" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "description": "Category has exercises", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/exercises": {
+      "get": {
+        "operationId": "listExercises",
+        "summary": "List all exercises",
+        "tags": ["Exercises"],
+        "parameters": [
+          { "$ref": "#/components/parameters/PageParam" },
+          { "$ref": "#/components/parameters/LimitParam" },
+          {
+            "name": "categoryId",
+            "in": "query",
+            "description": "Filter by category",
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "measurementType",
+            "in": "query",
+            "description": "Filter by measurement type",
+            "schema": { "$ref": "#/components/schemas/MeasurementType" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["data", "pagination"],
+                  "properties": {
+                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/Exercise" } },
+                    "pagination": { "$ref": "#/components/schemas/Pagination" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "post": {
+        "operationId": "createExercise",
+        "summary": "Create exercise",
+        "tags": ["Exercises"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateExerciseRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Exercise created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Exercise" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "409": { "$ref": "#/components/responses/Conflict" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/exercises/{exerciseId}": {
+      "parameters": [{ "$ref": "#/components/parameters/ExerciseIdParam" }],
+      "get": {
+        "operationId": "getExercise",
+        "summary": "Get exercise by ID",
+        "tags": ["Exercises"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Exercise" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "patch": {
+        "operationId": "updateExercise",
+        "summary": "Update exercise",
+        "tags": ["Exercises"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateExerciseRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Exercise updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Exercise" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "delete": {
+        "operationId": "deleteExercise",
+        "summary": "Delete exercise",
+        "tags": ["Exercises"],
+        "responses": {
+          "204": { "description": "Exercise deleted" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/user-progressions": {
+      "get": {
+        "operationId": "listUserProgressions",
+        "summary": "List user exercise progressions",
+        "description": "Get current user's progression for all categories",
+        "tags": ["User Progression"],
+        "parameters": [
+          { "$ref": "#/components/parameters/PageParam" },
+          { "$ref": "#/components/parameters/LimitParam" },
+          {
+            "name": "categoryId",
+            "in": "query",
+            "description": "Filter by category",
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["data", "pagination"],
+                  "properties": {
+                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/UserExerciseProgression" } },
+                    "pagination": { "$ref": "#/components/schemas/Pagination" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "post": {
+        "operationId": "createUserProgression",
+        "summary": "Create user progression",
+        "description": "Start tracking a new exercise category",
+        "tags": ["User Progression"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateUserProgressionRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Progression created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserExerciseProgression" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "409": { "$ref": "#/components/responses/Conflict" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/user-progressions/{progressionId}": {
+      "parameters": [{ "$ref": "#/components/parameters/ProgressionIdParam" }],
+      "get": {
+        "operationId": "getUserProgression",
+        "summary": "Get user progression by ID",
+        "tags": ["User Progression"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserExerciseProgression" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "patch": {
+        "operationId": "updateUserProgression",
+        "summary": "Update user progression",
+        "tags": ["User Progression"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateUserProgressionRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Progression updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserExerciseProgression" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/programs": {
+      "get": {
+        "operationId": "listPrograms",
+        "summary": "List user's programs",
+        "tags": ["Programs"],
+        "parameters": [
+          { "$ref": "#/components/parameters/PageParam" },
+          { "$ref": "#/components/parameters/LimitParam" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["data", "pagination"],
+                  "properties": {
+                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/Program" } },
+                    "pagination": { "$ref": "#/components/schemas/Pagination" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "post": {
+        "operationId": "createProgram",
+        "summary": "Create training program",
+        "tags": ["Programs"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateProgramRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Program created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Program" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/programs/{programId}": {
+      "parameters": [{ "$ref": "#/components/parameters/ProgramIdParam" }],
+      "get": {
+        "operationId": "getProgram",
+        "summary": "Get program by ID",
+        "tags": ["Programs"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Program" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "patch": {
+        "operationId": "updateProgram",
+        "summary": "Update program",
+        "tags": ["Programs"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateProgramRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Program updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Program" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "delete": {
+        "operationId": "deleteProgram",
+        "summary": "Delete program",
+        "tags": ["Programs"],
+        "responses": {
+          "204": { "description": "Program deleted" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/programs/{programId}/exercises": {
+      "parameters": [{ "$ref": "#/components/parameters/ProgramIdParam" }],
+      "get": {
+        "operationId": "listProgramExercises",
+        "summary": "List exercises in program",
+        "tags": ["Program Exercises"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["data"],
+                  "properties": {
+                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/ProgramExercise" } }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "post": {
+        "operationId": "addProgramExercise",
+        "summary": "Add exercise category to program",
+        "tags": ["Program Exercises"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateProgramExerciseRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Exercise added to program",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProgramExercise" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "409": { "$ref": "#/components/responses/Conflict" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/programs/{programId}/exercises/{programExerciseId}": {
+      "parameters": [
+        { "$ref": "#/components/parameters/ProgramIdParam" },
+        { "$ref": "#/components/parameters/ProgramExerciseIdParam" }
+      ],
+      "patch": {
+        "operationId": "updateProgramExercise",
+        "summary": "Update program exercise order",
+        "tags": ["Program Exercises"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateProgramExerciseRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Program exercise updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ProgramExercise" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "delete": {
+        "operationId": "removeProgramExercise",
+        "summary": "Remove exercise from program",
+        "tags": ["Program Exercises"],
+        "responses": {
+          "204": { "description": "Exercise removed from program" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/workout-sessions": {
+      "get": {
+        "operationId": "listWorkoutSessions",
+        "summary": "List workout sessions",
+        "tags": ["Workout Sessions"],
+        "parameters": [
+          { "$ref": "#/components/parameters/PageParam" },
+          { "$ref": "#/components/parameters/LimitParam" },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by session status",
+            "schema": { "$ref": "#/components/schemas/SessionStatus" }
+          },
+          {
+            "name": "programId",
+            "in": "query",
+            "description": "Filter by program",
+            "schema": { "type": "string", "format": "uuid" }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "Filter sessions from date",
+            "schema": { "type": "string", "format": "date" }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "Filter sessions to date",
+            "schema": { "type": "string", "format": "date" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["data", "pagination"],
+                  "properties": {
+                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/WorkoutSession" } },
+                    "pagination": { "$ref": "#/components/schemas/Pagination" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "post": {
+        "operationId": "createWorkoutSession",
+        "summary": "Create workout session",
+        "description": "Create a new planned or immediate workout session",
+        "tags": ["Workout Sessions"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateWorkoutSessionRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Session created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WorkoutSession" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/workout-sessions/{sessionId}": {
+      "parameters": [{ "$ref": "#/components/parameters/SessionIdParam" }],
+      "get": {
+        "operationId": "getWorkoutSession",
+        "summary": "Get workout session by ID",
+        "tags": ["Workout Sessions"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WorkoutSessionWithDetails" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "patch": {
+        "operationId": "updateWorkoutSession",
+        "summary": "Update workout session",
+        "description": "Update session status, complete session, etc.",
+        "tags": ["Workout Sessions"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateWorkoutSessionRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Session updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WorkoutSession" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      },
+      "delete": {
+        "operationId": "deleteWorkoutSession",
+        "summary": "Delete workout session",
+        "tags": ["Workout Sessions"],
+        "responses": {
+          "204": { "description": "Session deleted" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/workout-sessions/{sessionId}/start": {
+      "parameters": [{ "$ref": "#/components/parameters/SessionIdParam" }],
+      "post": {
+        "operationId": "startWorkoutSession",
+        "summary": "Start workout session",
+        "description": "Transition session from planned to in_progress",
+        "tags": ["Workout Sessions"],
+        "responses": {
+          "200": {
+            "description": "Session started",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WorkoutSession" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/workout-sessions/{sessionId}/complete": {
+      "parameters": [{ "$ref": "#/components/parameters/SessionIdParam" }],
+      "post": {
+        "operationId": "completeWorkoutSession",
+        "summary": "Complete workout session",
+        "description": "Mark session as completed and calculate totals",
+        "tags": ["Workout Sessions"],
+        "responses": {
+          "200": {
+            "description": "Session completed",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WorkoutSession" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/workout-sessions/{sessionId}/exercises": {
+      "parameters": [{ "$ref": "#/components/parameters/SessionIdParam" }],
+      "get": {
+        "operationId": "listWorkoutSessionExercises",
+        "summary": "List exercises in workout session",
+        "tags": ["Workout Session Exercises"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["data"],
+                  "properties": {
+                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/WorkoutSessionExercise" } }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/workout-sessions/{sessionId}/exercises/{sessionExerciseId}": {
+      "parameters": [
+        { "$ref": "#/components/parameters/SessionIdParam" },
+        { "$ref": "#/components/parameters/SessionExerciseIdParam" }
+      ],
+      "patch": {
+        "operationId": "updateWorkoutSessionExercise",
+        "summary": "Update workout session exercise",
+        "tags": ["Workout Session Exercises"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateWorkoutSessionExerciseRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Exercise updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WorkoutSessionExercise" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/workout-sessions/{sessionId}/exercises/{sessionExerciseId}/sets": {
+      "parameters": [
+        { "$ref": "#/components/parameters/SessionIdParam" },
+        { "$ref": "#/components/parameters/SessionExerciseIdParam" }
+      ],
+      "get": {
+        "operationId": "listWorkoutSets",
+        "summary": "List sets for exercise",
+        "tags": ["Workout Sets"],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["data"],
+                  "properties": {
+                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/WorkoutSet" } }
+                  }
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    },
+    "/workout-sessions/{sessionId}/exercises/{sessionExerciseId}/sets/{setId}": {
+      "parameters": [
+        { "$ref": "#/components/parameters/SessionIdParam" },
+        { "$ref": "#/components/parameters/SessionExerciseIdParam" },
+        { "$ref": "#/components/parameters/SetIdParam" }
+      ],
+      "patch": {
+        "operationId": "updateWorkoutSet",
+        "summary": "Update workout set",
+        "description": "Record actual value, mark as completed/skipped",
+        "tags": ["Workout Sets"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateWorkoutSetRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Set updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WorkoutSet" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        },
+        "security": [{ "bearerAuth": [] }]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "required": ["id", "email", "name", "username", "emailVerified", "createdAt"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "readOnly": true },
+          "email": { "type": "string", "format": "email" },
+          "name": { "type": "string" },
+          "username": { "type": "string" },
+          "displayUsername": { "type": "string", "nullable": true },
+          "emailVerified": { "type": "boolean" },
+          "image": { "type": "string", "format": "uri", "nullable": true },
+          "role": { "type": "string", "nullable": true },
+          "banned": { "type": "boolean", "nullable": true },
+          "banReason": { "type": "string", "nullable": true },
+          "banExpiresAt": { "type": "string", "format": "date-time", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time", "readOnly": true },
+          "updatedAt": { "type": "string", "format": "date-time", "readOnly": true }
+        }
+      },
+      "UpdateUserRequest": {
+        "type": "object",
+        "minProperties": 1,
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 100 },
+          "displayUsername": { "type": "string", "nullable": true },
+          "image": { "type": "string", "format": "uri", "nullable": true }
+        }
+      },
+      "ExerciseCategory": {
+        "type": "object",
+        "required": ["id", "name", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "readOnly": true },
+          "name": { "type": "string" },
+          "description": { "type": "string", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time", "readOnly": true },
+          "updatedAt": { "type": "string", "format": "date-time", "readOnly": true }
+        }
+      },
+      "CreateExerciseCategoryRequest": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 100 },
+          "description": { "type": "string", "maxLength": 500 }
+        }
+      },
+      "UpdateExerciseCategoryRequest": {
+        "type": "object",
+        "minProperties": 1,
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 100 },
+          "description": { "type": "string", "maxLength": 500, "nullable": true }
+        }
+      },
+      "MeasurementType": {
+        "type": "string",
+        "enum": ["reps", "duration", "distance"],
+        "description": "Type of measurement for exercise"
+      },
+      "Exercise": {
+        "type": "object",
+        "required": ["id", "categoryId", "name", "level", "measurementType", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "readOnly": true },
+          "categoryId": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "level": { "type": "number", "minimum": 0.1 },
+          "description": { "type": "string", "nullable": true },
+          "importantNote": { "type": "string", "nullable": true },
+          "measurementType": { "$ref": "#/components/schemas/MeasurementType" },
+          "targetToUnlockNext": { "type": "integer", "minimum": 1, "nullable": true },
+          "targetNote": { "type": "string", "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time", "readOnly": true },
+          "updatedAt": { "type": "string", "format": "date-time", "readOnly": true }
+        }
+      },
+      "CreateExerciseRequest": {
+        "type": "object",
+        "required": ["categoryId", "name", "level", "measurementType"],
+        "properties": {
+          "categoryId": { "type": "string", "format": "uuid" },
+          "name": { "type": "string", "minLength": 1, "maxLength": 100 },
+          "level": { "type": "number", "minimum": 0.1 },
+          "description": { "type": "string", "maxLength": 1000 },
+          "importantNote": { "type": "string", "maxLength": 500 },
+          "measurementType": { "$ref": "#/components/schemas/MeasurementType" },
+          "targetToUnlockNext": { "type": "integer", "minimum": 1 },
+          "targetNote": { "type": "string", "maxLength": 200 }
+        }
+      },
+      "UpdateExerciseRequest": {
+        "type": "object",
+        "minProperties": 1,
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 100 },
+          "level": { "type": "number", "minimum": 0.1 },
+          "description": { "type": "string", "maxLength": 1000, "nullable": true },
+          "importantNote": { "type": "string", "maxLength": 500, "nullable": true },
+          "targetToUnlockNext": { "type": "integer", "minimum": 1, "nullable": true },
+          "targetNote": { "type": "string", "maxLength": 200, "nullable": true }
+        }
+      },
+      "UserExerciseProgression": {
+        "type": "object",
+        "required": ["id", "userId", "categoryId", "exerciseId", "baseValue", "initialBaseValue", "unlockedAt", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "readOnly": true },
+          "userId": { "type": "string", "format": "uuid" },
+          "categoryId": { "type": "string", "format": "uuid" },
+          "exerciseId": { "type": "string", "format": "uuid" },
+          "baseValue": { "type": "integer", "minimum": 0 },
+          "initialBaseValue": { "type": "integer", "minimum": 0 },
+          "unlockedAt": { "type": "string", "format": "date-time" },
+          "createdAt": { "type": "string", "format": "date-time", "readOnly": true },
+          "updatedAt": { "type": "string", "format": "date-time", "readOnly": true }
+        }
+      },
+      "CreateUserProgressionRequest": {
+        "type": "object",
+        "required": ["categoryId", "exerciseId"],
+        "properties": {
+          "categoryId": { "type": "string", "format": "uuid" },
+          "exerciseId": { "type": "string", "format": "uuid" },
+          "baseValue": { "type": "integer", "minimum": 0, "default": 0 }
+        }
+      },
+      "UpdateUserProgressionRequest": {
+        "type": "object",
+        "minProperties": 1,
+        "properties": {
+          "exerciseId": { "type": "string", "format": "uuid" },
+          "baseValue": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "Program": {
+        "type": "object",
+        "required": ["id", "userId", "name", "trainingDays", "defaultRounds", "defaultRestBetweenRounds", "defaultRestBetweenExercises", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "readOnly": true },
+          "userId": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "trainingDays": {
+            "type": "array",
+            "items": { "type": "integer", "minimum": 1, "maximum": 7 },
+            "minItems": 3,
+            "maxItems": 5,
+            "uniqueItems": true,
+            "description": "Days of the week (1=Monday, 7=Sunday)"
+          },
+          "defaultRounds": { "type": "integer", "minimum": 1 },
+          "defaultRestBetweenRounds": { "type": "integer", "minimum": 0, "description": "Rest in seconds" },
+          "defaultRestBetweenExercises": { "type": "integer", "minimum": 0, "description": "Rest in seconds" },
+          "createdAt": { "type": "string", "format": "date-time", "readOnly": true },
+          "updatedAt": { "type": "string", "format": "date-time", "readOnly": true }
+        }
+      },
+      "CreateProgramRequest": {
+        "type": "object",
+        "required": ["name", "trainingDays"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 100 },
+          "trainingDays": {
+            "type": "array",
+            "items": { "type": "integer", "minimum": 1, "maximum": 7 },
+            "minItems": 3,
+            "maxItems": 5,
+            "uniqueItems": true
+          },
+          "defaultRounds": { "type": "integer", "minimum": 1, "default": 3 },
+          "defaultRestBetweenRounds": { "type": "integer", "minimum": 0, "default": 120 },
+          "defaultRestBetweenExercises": { "type": "integer", "minimum": 0, "default": 45 }
+        }
+      },
+      "UpdateProgramRequest": {
+        "type": "object",
+        "minProperties": 1,
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 100 },
+          "trainingDays": {
+            "type": "array",
+            "items": { "type": "integer", "minimum": 1, "maximum": 7 },
+            "minItems": 3,
+            "maxItems": 5,
+            "uniqueItems": true
+          },
+          "defaultRounds": { "type": "integer", "minimum": 1 },
+          "defaultRestBetweenRounds": { "type": "integer", "minimum": 0 },
+          "defaultRestBetweenExercises": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "ProgramExercise": {
+        "type": "object",
+        "required": ["id", "programId", "categoryId", "displayOrder", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "readOnly": true },
+          "programId": { "type": "string", "format": "uuid" },
+          "categoryId": { "type": "string", "format": "uuid" },
+          "displayOrder": { "type": "integer", "minimum": 1 },
+          "createdAt": { "type": "string", "format": "date-time", "readOnly": true },
+          "updatedAt": { "type": "string", "format": "date-time", "readOnly": true }
+        }
+      },
+      "CreateProgramExerciseRequest": {
+        "type": "object",
+        "required": ["categoryId", "displayOrder"],
+        "properties": {
+          "categoryId": { "type": "string", "format": "uuid" },
+          "displayOrder": { "type": "integer", "minimum": 1 }
+        }
+      },
+      "UpdateProgramExerciseRequest": {
+        "type": "object",
+        "required": ["displayOrder"],
+        "properties": {
+          "displayOrder": { "type": "integer", "minimum": 1 }
+        }
+      },
+      "SessionStatus": {
+        "type": "string",
+        "enum": ["planned", "in_progress", "completed", "skipped"],
+        "description": "Workout session status"
+      },
+      "SetStatus": {
+        "type": "string",
+        "enum": ["completed", "skipped", "auto_skipped"],
+        "description": "Workout set status"
+      },
+      "WorkoutSession": {
+        "type": "object",
+        "required": ["id", "userId", "programId", "status", "plannedRounds", "plannedRestBetweenRounds", "plannedRestBetweenExercises", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "readOnly": true },
+          "userId": { "type": "string", "format": "uuid" },
+          "programId": { "type": "string", "format": "uuid" },
+          "status": { "$ref": "#/components/schemas/SessionStatus" },
+          "scheduledDate": { "type": "string", "format": "date", "nullable": true },
+          "startedAt": { "type": "string", "format": "date-time", "nullable": true },
+          "completedAt": { "type": "string", "format": "date-time", "nullable": true },
+          "plannedRounds": { "type": "integer", "minimum": 1 },
+          "plannedRestBetweenRounds": { "type": "integer", "minimum": 0 },
+          "plannedRestBetweenExercises": { "type": "integer", "minimum": 0 },
+          "roundsCompleted": { "type": "integer", "minimum": 0, "nullable": true },
+          "totalDurationSeconds": { "type": "integer", "minimum": 0, "nullable": true },
+          "totalActiveSeconds": { "type": "integer", "minimum": 0, "nullable": true },
+          "totalRestSeconds": { "type": "integer", "minimum": 0, "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time", "readOnly": true },
+          "updatedAt": { "type": "string", "format": "date-time", "readOnly": true }
+        }
+      },
+      "WorkoutSessionWithDetails": {
+        "allOf": [
+          { "$ref": "#/components/schemas/WorkoutSession" },
+          {
+            "type": "object",
+            "properties": {
+              "exercises": {
+                "type": "array",
+                "items": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/WorkoutSessionExercise" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "sets": {
+                          "type": "array",
+                          "items": { "$ref": "#/components/schemas/WorkoutSet" }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        ]
+      },
+      "CreateWorkoutSessionRequest": {
+        "type": "object",
+        "required": ["programId"],
+        "properties": {
+          "programId": { "type": "string", "format": "uuid" },
+          "scheduledDate": { "type": "string", "format": "date" },
+          "plannedRounds": { "type": "integer", "minimum": 1 },
+          "plannedRestBetweenRounds": { "type": "integer", "minimum": 0 },
+          "plannedRestBetweenExercises": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "UpdateWorkoutSessionRequest": {
+        "type": "object",
+        "minProperties": 1,
+        "properties": {
+          "status": { "$ref": "#/components/schemas/SessionStatus" },
+          "scheduledDate": { "type": "string", "format": "date", "nullable": true },
+          "roundsCompleted": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "WorkoutSessionExercise": {
+        "type": "object",
+        "required": ["id", "workoutSessionId", "exerciseId", "displayOrder", "targetValue", "skipped", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "readOnly": true },
+          "workoutSessionId": { "type": "string", "format": "uuid" },
+          "exerciseId": { "type": "string", "format": "uuid" },
+          "displayOrder": { "type": "integer", "minimum": 1 },
+          "targetValue": { "type": "integer", "minimum": 0 },
+          "skipped": { "type": "boolean" },
+          "createdAt": { "type": "string", "format": "date-time", "readOnly": true },
+          "updatedAt": { "type": "string", "format": "date-time", "readOnly": true }
+        }
+      },
+      "UpdateWorkoutSessionExerciseRequest": {
+        "type": "object",
+        "minProperties": 1,
+        "properties": {
+          "targetValue": { "type": "integer", "minimum": 0 },
+          "skipped": { "type": "boolean" }
+        }
+      },
+      "WorkoutSet": {
+        "type": "object",
+        "required": ["id", "sessionExerciseId", "roundNumber", "status", "createdAt", "updatedAt"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "readOnly": true },
+          "sessionExerciseId": { "type": "string", "format": "uuid" },
+          "roundNumber": { "type": "integer", "minimum": 1 },
+          "status": { "$ref": "#/components/schemas/SetStatus" },
+          "actualValue": { "type": "integer", "minimum": 0, "nullable": true },
+          "startedAt": { "type": "string", "format": "date-time", "nullable": true },
+          "completedAt": { "type": "string", "format": "date-time", "nullable": true },
+          "durationSeconds": { "type": "integer", "minimum": 0, "nullable": true },
+          "restAfterSeconds": { "type": "integer", "minimum": 0, "nullable": true },
+          "createdAt": { "type": "string", "format": "date-time", "readOnly": true },
+          "updatedAt": { "type": "string", "format": "date-time", "readOnly": true }
+        }
+      },
+      "UpdateWorkoutSetRequest": {
+        "type": "object",
+        "minProperties": 1,
+        "properties": {
+          "status": { "$ref": "#/components/schemas/SetStatus" },
+          "actualValue": { "type": "integer", "minimum": 0 },
+          "durationSeconds": { "type": "integer", "minimum": 0 },
+          "restAfterSeconds": { "type": "integer", "minimum": 0 }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "required": ["page", "limit", "total", "totalPages"],
+        "properties": {
+          "page": { "type": "integer", "minimum": 1 },
+          "limit": { "type": "integer", "minimum": 1, "maximum": 100 },
+          "total": { "type": "integer", "minimum": 0 },
+          "totalPages": { "type": "integer", "minimum": 0 },
+          "hasNext": { "type": "boolean" },
+          "hasPrev": { "type": "boolean" }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": ["code", "message"],
+        "properties": {
+          "code": { "type": "string", "description": "Error code for programmatic handling" },
+          "message": { "type": "string", "description": "Human-readable error message" },
+          "details": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": { "type": "string" },
+                "message": { "type": "string" }
+              }
+            }
+          },
+          "requestId": { "type": "string", "description": "Request ID for support" }
+        }
+      }
+    },
+    "parameters": {
+      "PageParam": {
+        "name": "page",
+        "in": "query",
+        "description": "Page number (1-based)",
+        "schema": { "type": "integer", "minimum": 1, "default": 1 }
+      },
+      "LimitParam": {
+        "name": "limit",
+        "in": "query",
+        "description": "Items per page",
+        "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 }
+      },
+      "UserIdParam": {
+        "name": "userId",
+        "in": "path",
+        "required": true,
+        "description": "User ID",
+        "schema": { "type": "string", "format": "uuid" }
+      },
+      "CategoryIdParam": {
+        "name": "categoryId",
+        "in": "path",
+        "required": true,
+        "description": "Exercise category ID",
+        "schema": { "type": "string", "format": "uuid" }
+      },
+      "ExerciseIdParam": {
+        "name": "exerciseId",
+        "in": "path",
+        "required": true,
+        "description": "Exercise ID",
+        "schema": { "type": "string", "format": "uuid" }
+      },
+      "ProgressionIdParam": {
+        "name": "progressionId",
+        "in": "path",
+        "required": true,
+        "description": "User exercise progression ID",
+        "schema": { "type": "string", "format": "uuid" }
+      },
+      "ProgramIdParam": {
+        "name": "programId",
+        "in": "path",
+        "required": true,
+        "description": "Program ID",
+        "schema": { "type": "string", "format": "uuid" }
+      },
+      "ProgramExerciseIdParam": {
+        "name": "programExerciseId",
+        "in": "path",
+        "required": true,
+        "description": "Program exercise ID",
+        "schema": { "type": "string", "format": "uuid" }
+      },
+      "SessionIdParam": {
+        "name": "sessionId",
+        "in": "path",
+        "required": true,
+        "description": "Workout session ID",
+        "schema": { "type": "string", "format": "uuid" }
+      },
+      "SessionExerciseIdParam": {
+        "name": "sessionExerciseId",
+        "in": "path",
+        "required": true,
+        "description": "Workout session exercise ID",
+        "schema": { "type": "string", "format": "uuid" }
+      },
+      "SetIdParam": {
+        "name": "setId",
+        "in": "path",
+        "required": true,
+        "description": "Workout set ID",
+        "schema": { "type": "string", "format": "uuid" }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Invalid request",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": {
+              "code": "VALIDATION_ERROR",
+              "message": "Invalid request parameters",
+              "details": [{ "field": "name", "message": "Name is required" }]
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Authentication required",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "code": "UNAUTHORIZED", "message": "Authentication required" }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Insufficient permissions",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "code": "FORBIDDEN", "message": "Insufficient permissions" }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Resource not found",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "code": "NOT_FOUND", "message": "Resource not found" }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "Resource already exists",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/Error" },
+            "example": { "code": "CONFLICT", "message": "Resource already exists" }
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT token from better-auth"
+      }
+    }
+  },
+  "security": [{ "bearerAuth": [] }]
+}
