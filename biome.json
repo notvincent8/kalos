@@ -15,7 +15,8 @@
       "!build",
       "!.claude",
       "!tsconfig*.json",
-      "!app/components/ui"
+      "!app/components/ui",
+      "!public"
     ]
   },
   "formatter": {
@@ -83,7 +84,7 @@
   },
   "overrides": [
     {
-      "includes": ["migrations/**/*.ts"],
+      "includes": ["server/db/migrations/**/*.ts"],
       "linter": {
         "rules": {
           "suspicious": {
