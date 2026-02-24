@@ -7,8 +7,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("id", "uuid", (col) => col.notNull().primaryKey().defaultTo(sql`gen_random_uuid()`))
     .addColumn("name", "text", (col) => col.notNull())
     .addColumn("slug", "text", (col) => col.notNull().unique())
-    .addColumn("sort_order", "integer", (col) => col.notNull())
-    .addCheckConstraint("chk_exercise_category_sort_order", sql`sort_order >= 0`)
+    .addColumn("sort_order", "integer", (col) => col.notNull().check(sql`sort_order >= 0`))
     .addColumn("created_at", "timestamptz", (col) => col.notNull().defaultTo(sql`now()`))
     .addColumn("updated_at", "timestamptz", (col) => col.notNull().defaultTo(sql`now()`))
     .execute()
@@ -30,7 +29,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("created_at", "timestamptz", (col) => col.notNull().defaultTo(sql`now()`))
     .addColumn("updated_at", "timestamptz", (col) => col.notNull().defaultTo(sql`now()`))
     .addColumn("category_id", "uuid", (col) => col.notNull().references("exercise_category.id").onDelete("restrict"))
-    .addUniqueConstraint("unq_exercise_level_category", ["level", "is_variant", "category_id"])
+    .addUniqueConstraint("unq_exercise_level_variant_category", ["level", "is_variant", "category_id"])
     .execute()
 
   // Triggers to update `updated_at` on update
@@ -49,6 +48,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   `.execute(db)
 
   // Indexes
+  await db.schema.createIndex("idx_exercise_category_sort_order").on("exercise_category").column("sort_order").execute()
   await db.schema.createIndex("idx_exercise_category_id").on("exercise").column("category_id").execute()
 }
 

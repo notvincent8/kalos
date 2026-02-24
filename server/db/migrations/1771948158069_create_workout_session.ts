@@ -7,11 +7,11 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("status", sql`session_status`, (col) => col.notNull().defaultTo("planned"))
     .addColumn("started_at", "timestamptz")
     .addColumn("completed_at", "timestamptz")
-    .addCheckConstraint("chk_session_dates", sql`completed_at > started_at`)
+    .addCheckConstraint("chk_workout_session_dates", sql`(completed_at IS NULL) OR (started_at IS NOT NULL AND completed_at > started_at)`)
     .addColumn("rating", "integer", (col) => col.check(sql`rating >= 1 AND rating <= 10`))
     .addColumn("rpe", "integer", (col) => col.check(sql`rpe >= 1 AND rpe <= 10`))
     .addColumn("user_id", "uuid", (col) => col.notNull().references("user.id").onDelete("cascade"))
-    .addColumn("program_id", "uuid", (col) => col.notNull().references("program.id").onDelete("restrict"))
+    .addColumn("program_id", "uuid", (col) => col.references("program.id").onDelete("set null"))
     .addColumn("created_at", "timestamptz", (col) => col.notNull().defaultTo(sql`now()`))
     .addColumn("updated_at", "timestamptz", (col) => col.notNull().defaultTo(sql`now()`))
     .execute()
@@ -25,6 +25,8 @@ export async function up(db: Kysely<any>): Promise<void> {
   `.execute(db)
 
   // Indexes
+  await db.schema.createIndex("idx_workout_session_active").on("workout_session").column("user_id").where(sql`status = 'in_progress'`).execute()
+  await db.schema.createIndex("idx_workout_session_started_at").on("workout_session").column("started_at").execute()
   await db.schema.createIndex("idx_workout_session_user_id").on("workout_session").column("user_id").execute()
   await db.schema.createIndex("idx_workout_session_program_id").on("workout_session").column("program_id").execute()
 }

@@ -22,11 +22,12 @@ export async function up(db: Kysely<any>): Promise<void> {
     .createTable("program")
     .addColumn("id", "uuid", (col) => col.notNull().primaryKey().defaultTo(sql`gen_random_uuid()`))
     .addColumn("name", "text", (col) => col.notNull())
-    .addColumn("rounds", "integer", (col) => col.notNull().defaultTo(4))
-    .addColumn("rest_between_exercises", "integer", (col) => col.notNull().defaultTo(60))
-    .addColumn("rest_between_rounds", "integer", (col) => col.notNull().defaultTo(120))
+    .addColumn("rounds", "integer", (col) => col.notNull().defaultTo(4).check(sql`rounds >= 1`))
+    .addColumn("rest_between_exercises_sec", "integer", (col) => col.notNull().defaultTo(60).check(sql`rest_between_exercises_sec >= 0`))
+    .addColumn("rest_between_rounds_sec", "integer", (col) => col.notNull().defaultTo(120).check(sql`rest_between_rounds_sec >= 0`))
     .addColumn("days_in_week", sql`integer[]`, (col) => col.notNull().defaultTo(sql`'{}'`))
     .addColumn("archived_at", "timestamptz")
+    .addColumn("user_id", "uuid", (col) => col.notNull().references("user.id").onDelete("cascade"))
     .addColumn("created_at", "timestamptz", (col) => col.notNull().defaultTo(sql`now()`))
     .addColumn("updated_at", "timestamptz", (col) => col.notNull().defaultTo(sql`now()`))
     .execute()
@@ -46,6 +47,9 @@ export async function up(db: Kysely<any>): Promise<void> {
   FOR EACH ROW
   EXECUTE FUNCTION deduplicate_days_in_week()
 `.execute(db)
+
+  // Indexes
+  await db.schema.createIndex("idx_program_user_id").on("program").column("user_id").execute()
 }
 
 export async function down(db: Kysely<any>): Promise<void> {

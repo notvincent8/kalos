@@ -5,10 +5,11 @@ export async function up(db: Kysely<any>): Promise<void> {
     .createTable("workout_round")
     .addColumn("id", "uuid", (col) => col.notNull().primaryKey().defaultTo(sql`gen_random_uuid()`))
     .addColumn("round_number", "integer", (col) => col.notNull().check(sql`round_number >= 1`))
-    .addColumn("rest_after", "integer", (col) => col.notNull().check(sql`rest_after >= 0`))
+    .addColumn("rest_after_sec", "integer", (col) => col.notNull().check(sql`rest_after_sec >= 0`))
     .addColumn("session_id", "uuid", (col) => col.notNull().references("workout_session.id").onDelete("cascade"))
     .addColumn("created_at", "timestamptz", (col) => col.notNull().defaultTo(sql`now()`))
     .addColumn("updated_at", "timestamptz", (col) => col.notNull().defaultTo(sql`now()`))
+    .addUniqueConstraint("unq_workout_round_session_round", ["session_id", "round_number"])
     .execute()
 
   // Triggers to update `updated_at` on update
