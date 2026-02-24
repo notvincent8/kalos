@@ -25,5 +25,82 @@ export {
   newExerciseCategory,
 } from "./public/ExerciseCategory.js"
 export { type default as MeasurementType, measurementType } from "./public/MeasurementType.js"
+export {
+  type default as ProgramTable,
+  type NewProgram,
+  newProgram,
+  type Program,
+  type ProgramId,
+  type ProgramUpdate,
+  program,
+  programId,
+  programUpdate,
+} from "./public/Program.js"
+export {
+  type default as ProgramExerciseTable,
+  type NewProgramExercise,
+  newProgramExercise,
+  type ProgramExercise,
+  type ProgramExerciseId,
+  type ProgramExerciseUpdate,
+  programExercise,
+  programExerciseId,
+  programExerciseUpdate,
+} from "./public/ProgramExercise.js"
 export type { default as PublicSchema } from "./public/PublicSchema.js"
+export {
+  type default as RoundExerciseTable,
+  type NewRoundExercise,
+  newRoundExercise,
+  type RoundExercise,
+  type RoundExerciseId,
+  type RoundExerciseUpdate,
+  roundExercise,
+  roundExerciseId,
+  roundExerciseUpdate,
+} from "./public/RoundExercise.js"
 export { type default as SessionStatus, sessionStatus } from "./public/SessionStatus.js"
+export {
+  type default as UserCategoryLevelTable,
+  type NewUserCategoryLevel,
+  newUserCategoryLevel,
+  type UserCategoryLevel,
+  type UserCategoryLevelId,
+  type UserCategoryLevelUpdate,
+  userCategoryLevel,
+  userCategoryLevelId,
+  userCategoryLevelUpdate,
+} from "./public/UserCategoryLevel.js"
+export {
+  type default as UserCategoryLevelHistoryTable,
+  type NewUserCategoryLevelHistory,
+  newUserCategoryLevelHistory,
+  type UserCategoryLevelHistory,
+  type UserCategoryLevelHistoryId,
+  type UserCategoryLevelHistoryUpdate,
+  userCategoryLevelHistory,
+  userCategoryLevelHistoryId,
+  userCategoryLevelHistoryUpdate,
+} from "./public/UserCategoryLevelHistory.js"
+export {
+  type default as WorkoutRoundTable,
+  type NewWorkoutRound,
+  newWorkoutRound,
+  type WorkoutRound,
+  type WorkoutRoundId,
+  type WorkoutRoundUpdate,
+  workoutRound,
+  workoutRoundId,
+  workoutRoundUpdate,
+} from "./public/WorkoutRound.js"
+export {
+  type default as WorkoutSessionTable,
+  type NewWorkoutSession,
+  newWorkoutSession,
+  type WorkoutSession,
+  type WorkoutSessionId,
+  type WorkoutSessionUpdate,
+  workoutSession,
+  workoutSessionId,
+  workoutSessionUpdate,
+} from "./public/WorkoutSession.js"

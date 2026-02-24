@@ -3,9 +3,30 @@
 
 import type { default as ExerciseTable } from "./Exercise.js"
 import type { default as ExerciseCategoryTable } from "./ExerciseCategory.js"
+import type { default as ProgramTable } from "./Program.js"
+import type { default as ProgramExerciseTable } from "./ProgramExercise.js"
+import type { default as RoundExerciseTable } from "./RoundExercise.js"
+import type { default as UserCategoryLevelTable } from "./UserCategoryLevel.js"
+import type { default as UserCategoryLevelHistoryTable } from "./UserCategoryLevelHistory.js"
+import type { default as WorkoutRoundTable } from "./WorkoutRound.js"
+import type { default as WorkoutSessionTable } from "./WorkoutSession.js"
 
 export default interface PublicSchema {
+  roundExercise: RoundExerciseTable
+
+  workoutSession: WorkoutSessionTable
+
+  userCategoryLevelHistory: UserCategoryLevelHistoryTable
+
   exerciseCategory: ExerciseCategoryTable
 
+  userCategoryLevel: UserCategoryLevelTable
+
+  programExercise: ProgramExerciseTable
+
   exercise: ExerciseTable
+
+  workoutRound: WorkoutRoundTable
+
+  program: ProgramTable
 }

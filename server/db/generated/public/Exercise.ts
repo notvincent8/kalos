@@ -21,6 +21,9 @@ export default interface ExerciseTable {
   categoryId: ColumnType<ExerciseCategoryId, ExerciseCategoryId, ExerciseCategoryId>
 
   /** Can be null */
+  archivedAt: ColumnType<Date | null, Date | string | null, Date | string | null>
+
+  /** Can be null */
   description: ColumnType<string | null, string | null, string | null>
 
   isVariant: ColumnType<boolean, boolean | undefined, boolean>
@@ -56,6 +59,7 @@ export const exerciseId = z.uuid() as unknown as z.Schema<ExerciseId>
 export const exercise = z.object({
   id: exerciseId,
   categoryId: exerciseCategoryId,
+  archivedAt: z.coerce.date().nullable(),
   description: z.string().nullable(),
   isVariant: z.boolean(),
   level: z.number(),
@@ -71,6 +75,7 @@ export const exercise = z.object({
 export const newExercise = z.object({
   id: exerciseId.optional(),
   categoryId: exerciseCategoryId,
+  archivedAt: z.coerce.date().optional().nullable(),
   description: z.string().optional().nullable(),
   isVariant: z.boolean().optional(),
   level: z.number(),
@@ -86,6 +91,7 @@ export const newExercise = z.object({
 export const exerciseUpdate = z.object({
   id: exerciseId.optional(),
   categoryId: exerciseCategoryId.optional(),
+  archivedAt: z.coerce.date().optional().nullable(),
   description: z.string().optional().nullable(),
   isVariant: z.boolean().optional(),
   level: z.number().optional(),
