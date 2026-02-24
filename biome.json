@@ -16,7 +16,8 @@
       "!.claude",
       "!tsconfig*.json",
       "!app/components/ui",
-      "!public"
+      "!public",
+      "!server/db/migrations"
     ]
   },
   "formatter": {
