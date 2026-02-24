@@ -39,7 +39,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .createTable("account")
     .addColumn("id", "uuid", (col) => col.notNull().primaryKey().defaultTo(sql`gen_random_uuid()`))
     .addColumn("account_id", "text", (col) => col.notNull())
-    .addColumn("provided_id", "text", (col) => col.notNull())
+    .addColumn("provider_id", "text", (col) => col.notNull())
     .addColumn("user_id", "uuid", (col) => col.notNull().references("user.id").onDelete("cascade"))
     .addColumn("access_token", "text")
     .addColumn("refresh_token", "text")
