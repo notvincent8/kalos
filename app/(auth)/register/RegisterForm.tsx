@@ -3,12 +3,10 @@
 import { useRouter } from "next/navigation"
 import { type SyntheticEvent, useState, useTransition } from "react"
 import { z } from "zod"
-import { registerFormSchema } from "@/app/(auth)/auth.schema"
-import { type FieldErrors, formatAuthError, getAndFormatFirstError } from "@/app/(auth)/authUtils"
 import SubmitButton from "@/app/(auth)/components/SubmitButton"
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/app/components/ui/field"
 import { Input } from "@/app/components/ui/input"
-import { signUp } from "@/lib/auth-client"
+import { type FieldErrors, formatAuthError, getAndFormatFirstError, registerFormSchema, signUp } from "@/lib/auth"
 
 const RegisterForm = () => {
   const [isPending, startTransition] = useTransition()

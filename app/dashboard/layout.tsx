@@ -1,27 +1,28 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { useSession } from "@/lib/auth-client"
+import { useSession } from "@/lib/auth"
 
 type LayoutProps = {
   children: ReactNode
-  team: ReactNode
-  analytics: ReactNode
-  user: ReactNode
-  admin: ReactNode
 }
 
-const Layout = ({ children, team, analytics, user, admin }: LayoutProps) => {
+const Layout = ({ children }: LayoutProps) => {
   const { data: session, isPending: isSessionLoading } = useSession()
+
   return (
     <main>
-      <h1>dashboard/layout.tsx</h1>
+      <h1>Dashboard</h1>
+      {isSessionLoading ? <p>Loading session...</p> : <p>Welcome, {session?.user.username}</p>}
       {children}
-      {team}
-      {analytics}
-      {isSessionLoading ? <p>Loading session...</p> : session?.user.role === "admin" ? admin : user}
     </main>
   )
 }
 
 export default Layout
+
+// TODO: Add parallel routes when implementing dashboard features
+// - @team: Team management slot
+// - @analytics: Analytics slot
+// - @user: User-specific slot
+// - @admin: Admin-specific slot
