@@ -1,5 +1,5 @@
 import Link from "next/link"
-import HeaderAuth from "@/app/components/HeaderAuth"
+import HeaderAuth from "@/app/components/layout/HeaderAuth"
 
 const Header = () => {
   return (

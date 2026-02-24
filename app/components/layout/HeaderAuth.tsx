@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation"
 import { useTransition } from "react"
 import { Button } from "@/app/components/ui/button"
 import { Spinner } from "@/app/components/ui/spinner"
-import type { Session } from "@/lib/auth-client"
-import { signOut, useSession } from "@/lib/auth-client"
+import { type Session, signOut, useSession } from "@/lib/auth"
 
 const HeaderAuth = () => {
   const { data: session, isPending: isSessionLoading } = useSession()

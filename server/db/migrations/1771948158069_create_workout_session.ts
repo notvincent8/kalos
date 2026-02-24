@@ -1,4 +1,4 @@
-import { type Kysely, sql } from "kysely"
+import { type Kysely, type SqlBool, sql } from "kysely"
 
 export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
@@ -25,7 +25,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   `.execute(db)
 
   // Indexes
-  await db.schema.createIndex("idx_workout_session_active").on("workout_session").column("user_id").where(sql`status = 'in_progress'`).execute()
+  await db.schema.createIndex("idx_workout_session_active").on("workout_session").column("user_id").where(sql<SqlBool>`status = 'in_progress'`).execute()
   await db.schema.createIndex("idx_workout_session_started_at").on("workout_session").column("started_at").execute()
   await db.schema.createIndex("idx_workout_session_user_id").on("workout_session").column("user_id").execute()
   await db.schema.createIndex("idx_workout_session_program_id").on("workout_session").column("program_id").execute()
