@@ -174,15 +174,14 @@ const excludedTables = new Set([
   // Kysely migration tables
   "kysely_migration",
   "kysely_migration_lock",
-  // Common timestamp fields that are often managed by triggers and not needed in types
+  // Trigger functions
   "set_updated_at",
-  // Better-auth related tables (Better-auth already provides its own types, and these tables are internal to the auth system)
+  "deduplicate_days_in_week", // Add this line
+  // Better-auth related tables
   "user",
   "account",
   "session",
   "verification",
-  // Add any other tables you want to exclude
-  // 'some_internal_table',
 ])
 
 /** @type {import('kanel').Config} */
