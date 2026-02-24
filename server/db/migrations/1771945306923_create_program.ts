@@ -26,6 +26,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("rest_between_exercises", "integer", (col) => col.notNull().defaultTo(60))
     .addColumn("rest_between_rounds", "integer", (col) => col.notNull().defaultTo(120))
     .addColumn("days_in_week", sql`integer[]`, (col) => col.notNull().defaultTo(sql`'{}'`))
+    .addColumn("archived_at", "timestamptz")
     .addColumn("created_at", "timestamptz", (col) => col.notNull().defaultTo(sql`now()`))
     .addColumn("updated_at", "timestamptz", (col) => col.notNull().defaultTo(sql`now()`))
     .execute()

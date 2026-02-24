@@ -25,6 +25,8 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn("measurement_type", sql`measurement_type`, (col) => col.notNull().defaultTo("rep"))
     .addColumn("progression_threshold", "integer")
     .addColumn("progression_threshold_note", "text")
+    .addColumn("archived_at", "timestamptz")
+
     .addColumn("created_at", "timestamptz", (col) => col.notNull().defaultTo(sql`now()`))
     .addColumn("updated_at", "timestamptz", (col) => col.notNull().defaultTo(sql`now()`))
     .addColumn("category_id", "uuid", (col) => col.notNull().references("exercise_category.id").onDelete("restrict"))
