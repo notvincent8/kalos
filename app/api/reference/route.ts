@@ -1,5 +1,16 @@
 import { ApiReference } from "@scalar/nextjs-api-reference"
 
 export const GET = ApiReference({
-  url: `${process.env.NEXT_PUBLIC_URL || "http://localhost:3000"}/openapi.json`,
+  url: "/openapi.json",
+  theme: "kepler",
+  layout: "modern",
+  darkMode: true,
+  metaData: {
+    title: "Kalos API Reference",
+    description: "API reference for the Kalos application",
+  },
+  agent: {
+    disabled: true,
+  },
+  telemetry: false,
 })
