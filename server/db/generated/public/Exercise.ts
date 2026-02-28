@@ -3,8 +3,9 @@
 
 import type { ColumnType, Insertable, Selectable, Updateable } from "kysely"
 import { z } from "zod"
-import { type ExerciseCategoryId, exerciseCategoryId } from "./ExerciseCategory.js"
-import { type default as MeasurementType, measurementType } from "./MeasurementType.js"
+import { type ExerciseCategoryId, exerciseCategoryId } from "./ExerciseCategory"
+import { type default as MeasurementType, measurementType } from "./MeasurementType"
+import { type default as Visibility, visibility } from "./Visibility"
 
 /** Identifier type for public.exercise */
 export type ExerciseId = string & { __brand: "public.exercise" }
@@ -19,6 +20,12 @@ export default interface ExerciseTable {
 
   /** References: exercise_category.id */
   categoryId: ColumnType<ExerciseCategoryId, ExerciseCategoryId, ExerciseCategoryId>
+
+  /**
+   * Can be null
+   * References: user.id
+   */
+  userId: ColumnType<string | null, string | null, string | null>
 
   /** Can be null */
   archivedAt: ColumnType<Date | null, Date | string | null, Date | string | null>
@@ -43,6 +50,8 @@ export default interface ExerciseTable {
   /** Can be null */
   progressionThresholdNote: ColumnType<string | null, string | null, string | null>
 
+  visibility: ColumnType<Visibility, Visibility | undefined, Visibility>
+
   createdAt: ColumnType<Date, Date | string | undefined, Date | string>
 
   updatedAt: ColumnType<Date, Date | string | undefined, Date | string>
@@ -59,6 +68,7 @@ export const exerciseId = z.uuid() as unknown as z.Schema<ExerciseId>
 export const exercise = z.object({
   id: exerciseId,
   categoryId: exerciseCategoryId,
+  userId: z.uuid().nullable(),
   archivedAt: z.coerce.date().nullable(),
   description: z.string().nullable(),
   isVariant: z.boolean(),
@@ -68,6 +78,7 @@ export const exercise = z.object({
   note: z.string().nullable(),
   progressionThreshold: z.number().nullable(),
   progressionThresholdNote: z.string().nullable(),
+  visibility: visibility,
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 }) as unknown as z.Schema<Exercise>
@@ -75,6 +86,7 @@ export const exercise = z.object({
 export const newExercise = z.object({
   id: exerciseId.optional(),
   categoryId: exerciseCategoryId,
+  userId: z.uuid().optional().nullable(),
   archivedAt: z.coerce.date().optional().nullable(),
   description: z.string().optional().nullable(),
   isVariant: z.boolean().optional(),
@@ -84,6 +96,7 @@ export const newExercise = z.object({
   note: z.string().optional().nullable(),
   progressionThreshold: z.number().optional().nullable(),
   progressionThresholdNote: z.string().optional().nullable(),
+  visibility: visibility.optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 }) as unknown as z.Schema<NewExercise>
@@ -91,6 +104,7 @@ export const newExercise = z.object({
 export const exerciseUpdate = z.object({
   id: exerciseId.optional(),
   categoryId: exerciseCategoryId.optional(),
+  userId: z.uuid().optional().nullable(),
   archivedAt: z.coerce.date().optional().nullable(),
   description: z.string().optional().nullable(),
   isVariant: z.boolean().optional(),
@@ -100,6 +114,7 @@ export const exerciseUpdate = z.object({
   note: z.string().optional().nullable(),
   progressionThreshold: z.number().optional().nullable(),
   progressionThresholdNote: z.string().optional().nullable(),
+  visibility: visibility.optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 }) as unknown as z.Schema<ExerciseUpdate>

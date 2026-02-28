@@ -22,14 +22,19 @@ export async function up(db: Kysely<any>): Promise<void> {
     .createTable("program")
     .addColumn("id", "uuid", (col) => col.notNull().primaryKey().defaultTo(sql`gen_random_uuid()`))
     .addColumn("name", "text", (col) => col.notNull())
+    .addColumn("visibility", sql`visibility`, (col) => col.notNull().defaultTo("private"))
     .addColumn("rounds", "integer", (col) => col.notNull().defaultTo(4).check(sql`rounds >= 1`))
     .addColumn("rest_between_exercises_sec", "integer", (col) => col.notNull().defaultTo(60).check(sql`rest_between_exercises_sec >= 0`))
     .addColumn("rest_between_rounds_sec", "integer", (col) => col.notNull().defaultTo(120).check(sql`rest_between_rounds_sec >= 0`))
     .addColumn("days_in_week", sql`integer[]`, (col) => col.notNull().defaultTo(sql`'{}'`))
     .addColumn("archived_at", "timestamptz")
-    .addColumn("user_id", "uuid", (col) => col.notNull().references("user.id").onDelete("cascade"))
+    .addColumn("user_id", "uuid", (col) => col.references("user.id").onDelete("cascade"))
     .addColumn("created_at", "timestamptz", (col) => col.notNull().defaultTo(sql`now()`))
     .addColumn("updated_at", "timestamptz", (col) => col.notNull().defaultTo(sql`now()`))
+    .addCheckConstraint("chk_program_visibility_user", sql`
+        (visibility = 'system' AND user_id IS NULL) OR
+        (visibility IN ('private', 'public') AND user_id IS NOT NULL)
+    `)
     .execute()
 
   // Triggers to update `updated_at` on update
@@ -50,6 +55,7 @@ export async function up(db: Kysely<any>): Promise<void> {
 
   // Indexes
   await db.schema.createIndex("idx_program_user_id").on("program").column("user_id").execute()
+  await db.schema.createIndex("idx_program_user_visibility").on("program").columns(["visibility", "user_id"]).execute()
 }
 
 export async function down(db: Kysely<any>): Promise<void> {

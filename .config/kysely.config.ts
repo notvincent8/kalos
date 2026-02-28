@@ -1,3 +1,4 @@
+import { CamelCasePlugin } from "kysely"
 import { defineConfig } from "kysely-ctl"
 import { dialect } from "../server/db"
 
@@ -6,8 +7,5 @@ export default defineConfig({
   migrations: {
     migrationFolder: "../server/db/migrations",
   },
-  //   plugins: [],
-  //   seeds: {
-  //     seedFolder: "seeds",
-  //   }
+  plugins: [new CamelCasePlugin()],
 })

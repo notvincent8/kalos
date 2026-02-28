@@ -3,8 +3,8 @@
 
 import type { ColumnType, Insertable, Selectable, Updateable } from "kysely"
 import { z } from "zod"
-import { type ExerciseId, exerciseId } from "./Exercise.js"
-import { type WorkoutRoundId, workoutRoundId } from "./WorkoutRound.js"
+import { type ExerciseId, exerciseId } from "./Exercise"
+import { type WorkoutRoundId, workoutRoundId } from "./WorkoutRound"
 
 /** Identifier type for public.round_exercise */
 export type RoundExerciseId = string & { __brand: "public.round_exercise" }

@@ -3,6 +3,7 @@
 
 import type { ColumnType, Insertable, Selectable, Updateable } from "kysely"
 import { z } from "zod"
+import { type default as Visibility, visibility } from "./Visibility"
 
 /** Identifier type for public.exercise_category */
 export type ExerciseCategoryId = string & { __brand: "public.exercise_category" }
@@ -15,11 +16,19 @@ export default interface ExerciseCategoryTable {
   /** Primary key */
   id: ColumnType<ExerciseCategoryId, ExerciseCategoryId | undefined, ExerciseCategoryId>
 
+  /**
+   * Can be null
+   * References: user.id
+   */
+  userId: ColumnType<string | null, string | null, string | null>
+
   name: ColumnType<string, string, string>
 
   slug: ColumnType<string, string, string>
 
   sortOrder: ColumnType<number, number, number>
+
+  visibility: ColumnType<Visibility, Visibility | undefined, Visibility>
 
   createdAt: ColumnType<Date, Date | string | undefined, Date | string>
 
@@ -36,27 +45,33 @@ export const exerciseCategoryId = z.uuid() as unknown as z.Schema<ExerciseCatego
 
 export const exerciseCategory = z.object({
   id: exerciseCategoryId,
+  userId: z.uuid().nullable(),
   name: z.string(),
   slug: z.string(),
   sortOrder: z.number(),
+  visibility: visibility,
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 }) as unknown as z.Schema<ExerciseCategory>
 
 export const newExerciseCategory = z.object({
   id: exerciseCategoryId.optional(),
+  userId: z.uuid().optional().nullable(),
   name: z.string(),
   slug: z.string(),
   sortOrder: z.number(),
+  visibility: visibility.optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 }) as unknown as z.Schema<NewExerciseCategory>
 
 export const exerciseCategoryUpdate = z.object({
   id: exerciseCategoryId.optional(),
+  userId: z.uuid().optional().nullable(),
   name: z.string().optional(),
   slug: z.string().optional(),
   sortOrder: z.number().optional(),
+  visibility: visibility.optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 }) as unknown as z.Schema<ExerciseCategoryUpdate>

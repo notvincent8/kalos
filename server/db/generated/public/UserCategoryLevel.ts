@@ -3,7 +3,7 @@
 
 import type { ColumnType, Insertable, Selectable, Updateable } from "kysely"
 import { z } from "zod"
-import { type ExerciseCategoryId, exerciseCategoryId } from "./ExerciseCategory.js"
+import { type ExerciseCategoryId, exerciseCategoryId } from "./ExerciseCategory"
 
 /** Identifier type for public.user_category_level */
 export type UserCategoryLevelId = string & { __brand: "public.user_category_level" }

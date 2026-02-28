@@ -3,6 +3,7 @@
 
 import type { ColumnType, Insertable, Selectable, Updateable } from "kysely"
 import { z } from "zod"
+import { type default as Visibility, visibility } from "./Visibility"
 
 /** Identifier type for public.program */
 export type ProgramId = string & { __brand: "public.program" }
@@ -15,8 +16,11 @@ export default interface ProgramTable {
   /** Primary key */
   id: ColumnType<ProgramId, ProgramId | undefined, ProgramId>
 
-  /** References: user.id */
-  userId: ColumnType<string, string, string>
+  /**
+   * Can be null
+   * References: user.id
+   */
+  userId: ColumnType<string | null, string | null, string | null>
 
   /** Can be null */
   archivedAt: ColumnType<Date | null, Date | string | null, Date | string | null>
@@ -30,6 +34,8 @@ export default interface ProgramTable {
   restBetweenRoundsSec: ColumnType<number, number | undefined, number>
 
   rounds: ColumnType<number, number | undefined, number>
+
+  visibility: ColumnType<Visibility, Visibility | undefined, Visibility>
 
   createdAt: ColumnType<Date, Date | string | undefined, Date | string>
 
@@ -46,39 +52,42 @@ export const programId = z.uuid() as unknown as z.Schema<ProgramId>
 
 export const program = z.object({
   id: programId,
-  userId: z.uuid(),
+  userId: z.uuid().nullable(),
   archivedAt: z.coerce.date().nullable(),
   daysInWeek: z.number().array(),
   name: z.string(),
   restBetweenExercisesSec: z.number(),
   restBetweenRoundsSec: z.number(),
   rounds: z.number(),
+  visibility: visibility,
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 }) as unknown as z.Schema<Program>
 
 export const newProgram = z.object({
   id: programId.optional(),
-  userId: z.uuid(),
+  userId: z.uuid().optional().nullable(),
   archivedAt: z.coerce.date().optional().nullable(),
   daysInWeek: z.number().array().optional(),
   name: z.string(),
   restBetweenExercisesSec: z.number().optional(),
   restBetweenRoundsSec: z.number().optional(),
   rounds: z.number().optional(),
+  visibility: visibility.optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 }) as unknown as z.Schema<NewProgram>
 
 export const programUpdate = z.object({
   id: programId.optional(),
-  userId: z.uuid().optional(),
+  userId: z.uuid().optional().nullable(),
   archivedAt: z.coerce.date().optional().nullable(),
   daysInWeek: z.number().array().optional(),
   name: z.string().optional(),
   restBetweenExercisesSec: z.number().optional(),
   restBetweenRoundsSec: z.number().optional(),
   rounds: z.number().optional(),
+  visibility: visibility.optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 }) as unknown as z.Schema<ProgramUpdate>

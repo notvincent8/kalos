@@ -3,8 +3,8 @@
 
 import type { ColumnType, Insertable, Selectable, Updateable } from "kysely"
 import { z } from "zod"
-import { type ProgramId, programId } from "./Program.js"
-import { type default as SessionStatus, sessionStatus } from "./SessionStatus.js"
+import { type ProgramId, programId } from "./Program"
+import { type default as SessionStatus, sessionStatus } from "./SessionStatus"
 
 /** Identifier type for public.workout_session */
 export type WorkoutSessionId = string & { __brand: "public.workout_session" }
