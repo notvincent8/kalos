@@ -1,5 +1,7 @@
 import { betterAuth } from "better-auth"
+import { nextCookies } from "better-auth/next-js"
 import { admin, username } from "better-auth/plugins"
+import { ac, user } from "@/lib/auth/permission"
 import { db } from "@/server/db"
 
 export const auth = betterAuth({
@@ -23,7 +25,16 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  plugins: [admin(), username()],
+  plugins: [
+    admin({
+      ac,
+      roles: {
+        user,
+      },
+    }),
+    username(),
+    nextCookies(),
+  ],
 })
 
 export type Session = typeof auth.$Infer.Session
