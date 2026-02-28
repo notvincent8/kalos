@@ -28,8 +28,8 @@ type ErrorFields = {
 const ResetPasswordForm = ({ token }: { token: string }) => {
   const [isPending, startTransition] = useTransition()
   const [isSuccess, setIsSuccess] = useState(false)
-  const [error, setError] = useState({ password: "", confirmPassword: "", root: "" })
   const [error, setError] = useState<ErrorFields>({})
+  const [isInRedirection, setIsInRedirection] = useState(false)
 
   const router = useRouter()
 
@@ -59,6 +59,24 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
 
       setIsSuccess(true)
     })
+  }
+
+  const handleSuccessComplete = () => {
+    setIsInRedirection(true)
+    setTimeout(() => {
+      router.push("/login")
+    }, 2000)
+  }
+
+  if (isInRedirection) {
+    return (
+      <div className="flex flex-col gap-4 rounded-md border border-muted bg-muted p-7">
+        <p className="text-muted-foreground">Your password has been updated successfully.</p>
+        <p className="text-sm text-muted-foreground flex items-center gap-1">
+          Redirecting to login page... <Spinner data-icon="inline-start" />
+        </p>
+      </div>
+    )
   }
 
   return (
@@ -101,7 +119,7 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
               success: "Password updated!",
             }}
             className="w-full"
-            onSuccessComplete={() => router.push("/login")}
+            onSuccessComplete={handleSuccessComplete}
           />
         </Field>
       </FieldGroup>
