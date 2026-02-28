@@ -8,7 +8,7 @@ import { Input } from "@/app/components/ui/input"
 import { requestPasswordReset } from "@/lib/auth/client"
 
 const emailSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  email: z.email("Please enter a valid email address"),
 })
 
 const RequestResetPasswordForm = () => {
