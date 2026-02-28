@@ -2,15 +2,20 @@
 
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useTransition } from "react"
+import { useEffect, useState, useTransition } from "react"
 import { Button } from "@/app/components/ui/button"
 import { Spinner } from "@/app/components/ui/spinner"
 import { type Session, signOut, useSession } from "@/lib/auth"
 
 const HeaderAuth = () => {
+  const [isMounted, setIsMounted] = useState(false)
   const { data: session, isPending: isSessionLoading } = useSession()
 
-  if (isSessionLoading) {
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted || isSessionLoading) {
     return (
       <div className="flex items-center gap-4">
         <Spinner data-icon="inline-start" />
