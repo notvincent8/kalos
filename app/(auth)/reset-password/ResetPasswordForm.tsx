@@ -6,7 +6,8 @@ import { z } from "zod"
 import PasswordInput from "@/app/(auth)/components/PasswordInput"
 import SubmitButton from "@/app/(auth)/components/SubmitButton"
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/app/components/ui/field"
-import { resetPassword } from "@/lib/auth"
+import { Spinner } from "@/app/components/ui/spinner"
+import { formatAuthError, getAndFormatFirstError, resetPassword } from "@/lib/auth"
 
 const passwordSchema = z
   .object({
@@ -18,15 +19,23 @@ const passwordSchema = z
     path: ["confirmPassword"],
   })
 
+type ErrorFields = {
+  password?: string[]
+  confirmPassword?: string[]
+  root?: string[]
+}
+
 const ResetPasswordForm = ({ token }: { token: string }) => {
   const [isPending, startTransition] = useTransition()
   const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState({ password: "", confirmPassword: "", root: "" })
+  const [error, setError] = useState<ErrorFields>({})
+
   const router = useRouter()
 
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setError({ password: "", confirmPassword: "", root: "" })
+    setError({})
 
     const formData = new FormData(e.currentTarget)
     const result = passwordSchema.safeParse({
@@ -35,12 +44,8 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
     })
 
     if (!result.success) {
-      const fieldErrors = result.error.flatten().fieldErrors
-      setError({
-        password: fieldErrors.password?.[0] ?? "",
-        confirmPassword: fieldErrors.confirmPassword?.[0] ?? "",
-        root: "",
-      })
+      const fieldErrors = z.flattenError(result.error).fieldErrors
+      setError(fieldErrors)
       return
     }
 
@@ -48,7 +53,7 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
       const { error } = await resetPassword({ newPassword: result.data.password, token })
 
       if (error) {
-        setError({ password: "", confirmPassword: "", root: error.message ?? "Something went wrong" })
+        setError(formatAuthError(error))
         return
       }
 
@@ -58,24 +63,20 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
 
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
-      {error.root && (
-        <div className="rounded-md border border-destructive/50 bg-destructive/10 p-4">
-          <p className="text-sm text-destructive">{error.root}</p>
-        </div>
-      )}
+      <FieldError errors={getAndFormatFirstError(error.root)} />
       <FieldGroup>
-        <Field data-invalid={!!error.password}>
+        <Field data-invalid={!!error.password || !!error.confirmPassword}>
           <FieldLabel htmlFor="fieldgroup-password">
             New password <span className="text-destructive">*</span>
           </FieldLabel>
           <PasswordInput
-            aria-invalid={!!error.password}
+            aria-invalid={!!error.password || !!error.confirmPassword}
             name="password"
             required
             id="fieldgroup-password"
             autoComplete="new-password"
           />
-          {error.password && <FieldError>{error.password}</FieldError>}
+          <FieldError errors={getAndFormatFirstError(error.password)} />
         </Field>
         <Field data-invalid={!!error.confirmPassword}>
           <FieldLabel htmlFor="fieldgroup-confirmPassword">
@@ -88,7 +89,7 @@ const ResetPasswordForm = ({ token }: { token: string }) => {
             id="fieldgroup-confirmPassword"
             autoComplete="new-password"
           />
-          {error.confirmPassword && <FieldError>{error.confirmPassword}</FieldError>}
+          <FieldError errors={getAndFormatFirstError(error.confirmPassword)} />
         </Field>
         <Field orientation="horizontal">
           <SubmitButton
