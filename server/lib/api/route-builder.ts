@@ -1,4 +1,3 @@
-import { NoResultError } from "kysely"
 import { type NextRequest, NextResponse } from "next/server"
 import type z from "zod"
 import type { statement } from "@/lib/auth/permission"

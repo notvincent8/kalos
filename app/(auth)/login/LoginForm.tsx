@@ -1,6 +1,5 @@
 "use client"
 
-import { EyeClosedIcon, EyeIcon } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { type SyntheticEvent, useState, useTransition } from "react"
