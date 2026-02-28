@@ -5,6 +5,7 @@ import gsap from "gsap"
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/app/components/ui/button"
 import { Spinner } from "@/app/components/ui/spinner"
+import { cn } from "@/lib/utils"
 
 gsap.registerPlugin(useGSAP)
 
@@ -16,6 +17,7 @@ type SubmitButtonProps = {
   labels: { [K in Status]: string }
   onSuccessComplete?: () => void
   successDuration?: number
+  className?: string
 }
 
 const SubmitButton = ({
@@ -24,6 +26,7 @@ const SubmitButton = ({
   labels,
   onSuccessComplete,
   successDuration = 1000,
+  className,
 }: SubmitButtonProps) => {
   const buttonRef = useRef<HTMLButtonElement>(null!)
   const [showSuccess, setShowSuccess] = useState(false)
@@ -53,7 +56,10 @@ const SubmitButton = ({
   return (
     <Button
       ref={buttonRef}
-      className="data-[status=success]:bg-olive data-[status=success]:text-white data-[status=success]:opacity-100  "
+      className={cn(
+        "data-[status=success]:bg-olive data-[status=success]:text-white data-[status=success]:opacity-100",
+        className,
+      )}
       disabled={isPending || showSuccess}
       type="submit"
       data-status={status}

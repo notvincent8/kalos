@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth"
 import { nextCookies } from "better-auth/next-js"
 import { admin, username } from "better-auth/plugins"
+import { after } from "next/server"
 import { ac, user } from "@/lib/auth/permission"
 import { db } from "@/server/db"
 
@@ -24,6 +25,20 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
+    sendResetPassword: async ({ user, url, token }) => {
+      /* Avoid awaiting the email sending to prevent timing attacks.
+      On serverless platforms, use waitUntil or similar (after) to ensure the email is sent.
+      */
+      after(() => {
+        console.log("Simulating email sending...")
+        console.log("Send reset password email to", user.email)
+        console.log("Reset password URL:", url)
+        console.log("Reset password token:", token)
+      })
+    },
+    onPasswordReset: async ({ user }) => {
+      console.log("Password reset for user", user.email)
+    },
   },
   plugins: [
     admin({

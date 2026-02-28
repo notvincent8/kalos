@@ -15,5 +15,5 @@ const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_URL,
 })
 
-export const { useSession, signIn, signOut, signUp } = authClient
+export const { useSession, signIn, signOut, signUp, requestPasswordReset, resetPassword } = authClient
 export type Session = typeof authClient.$Infer.Session
