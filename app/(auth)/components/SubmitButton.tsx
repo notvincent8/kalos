@@ -7,8 +7,6 @@ import { Button } from "@/app/components/ui/button"
 import { Spinner } from "@/app/components/ui/spinner"
 import { cn } from "@/lib/utils"
 
-gsap.registerPlugin(useGSAP)
-
 export type Status = "idle" | "pending" | "success"
 
 type SubmitButtonProps = {

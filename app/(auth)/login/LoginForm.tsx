@@ -6,7 +6,6 @@ import { type SyntheticEvent, useState, useTransition } from "react"
 import { z } from "zod"
 import PasswordInput from "@/app/(auth)/components/PasswordInput"
 import SubmitButton from "@/app/(auth)/components/SubmitButton"
-import { Button } from "@/app/components/ui/button"
 import { Checkbox } from "@/app/components/ui/checkbox"
 import { Field, FieldError, FieldGroup, FieldLabel } from "@/app/components/ui/field"
 import { Input } from "@/app/components/ui/input"
@@ -46,61 +45,75 @@ const LoginForm = () => {
       if (error) {
         setError(formatAuthError(error))
         return
-      } else {
-        setIsSuccess(true)
       }
+      setIsSuccess(true)
     })
   }
+
   return (
-    <form className="w-90 flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
+    <form className="flex flex-col gap-6" onSubmit={handleSubmit} noValidate>
       <FieldError errors={getAndFormatFirstError(error.root)} />
-      <FieldGroup>
-        <Field data-invalid={!!error.username}>
-          <FieldLabel htmlFor="fieldgroup-username">
-            Username <span className="text-destructive">*</span>
+
+      <FieldGroup className="gap-5">
+        <Field data-invalid={!!error.username} className="auth-field">
+          <FieldLabel htmlFor="fieldgroup-username" className="text-xs tracking-[0.15em] font-medium uppercase mb-2">
+            Username
           </FieldLabel>
           <Input
+            aria-labelledby="fieldgroup-username"
             aria-invalid={!!error.username}
             name="username"
             required
             id="fieldgroup-username"
-            placeholder="calisthenyFever6"
+            placeholder="your username"
             type="text"
+            className="h-12 bg-transparent border-border/60 focus:border-foreground focus:bg-muted/30 transition-all duration-200 placeholder:text-muted-foreground/40"
           />
           <FieldError errors={getAndFormatFirstError(error.username)} />
         </Field>
 
-        <Field data-invalid={!!error.password}>
-          <FieldLabel htmlFor="fieldgroup-password">
-            Password <span className="text-destructive">*</span>
+        <Field data-invalid={!!error.password} className="auth-field">
+          <FieldLabel htmlFor="fieldgroup-password" className="text-xs tracking-[0.15em] font-medium uppercase mb-2">
+            Password
           </FieldLabel>
-          <PasswordInput name="password" required id="fieldgroup-password" aria-invalid={!!error.password} />
+          <PasswordInput
+            name="password"
+            required
+            id="fieldgroup-password"
+            aria-invalid={!!error.password}
+            className="h-12 bg-transparent border-border/60 focus:border-foreground focus:bg-muted/30 transition-all duration-200"
+          />
           <FieldError errors={getAndFormatFirstError(error.password)} />
         </Field>
-        <div className="flex items-center justify-between">
-          <Field orientation="horizontal">
-            <Checkbox name="rememberMe" id="fieldgroup-rememberMe" />
-            <FieldLabel htmlFor="fieldgroup-rememberMe" className="flex items-center gap-2">
+
+        <div className="auth-field flex items-center justify-between pt-1">
+          <Field orientation="horizontal" className="gap-2.5">
+            <Checkbox name="rememberMe" id="fieldgroup-rememberMe" className="border-border/60" />
+            <FieldLabel htmlFor="fieldgroup-rememberMe" className="text-sm text-muted-foreground cursor-pointer">
               Remember me
             </FieldLabel>
           </Field>
-          <Button asChild variant="link" className="ml-auto p-0">
-            <Link href="/request-reset-password">Forgot password?</Link>
-          </Button>
+          <Link
+            href="/request-reset-password"
+            className="text-sm text-muted-foreground hover:text-foreground text-nowrap transition-colors duration-200"
+          >
+            Forgot password?
+          </Link>
         </div>
-        <Field orientation="horizontal">
+
+        <div className="auth-field pt-4">
           <SubmitButton
             isPending={isPending}
             isSuccess={isSuccess}
             labels={{
-              idle: "Log in",
-              pending: "Logging in...",
-              success: "You're in!",
+              idle: "Sign in",
+              pending: "Signing in...",
+              success: "Welcome back",
             }}
-            className="w-full -mt-4"
-            onSuccessComplete={() => router.push("/dashboard")}
+            className="w-full h-12 text-sm font-medium tracking-widest uppercase"
+            onSuccessComplete={() => router.replace("/dashboard")}
           />
-        </Field>
+        </div>
       </FieldGroup>
     </form>
   )

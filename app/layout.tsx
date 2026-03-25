@@ -1,7 +1,11 @@
 import type { Metadata } from "next"
 import { Cormorant_Garamond, DM_Sans } from "next/font/google"
 import "./globals.css"
-import { Footer, Header } from "@/app/components/layout"
+import { useGSAP } from "@gsap/react"
+import gsap from "gsap"
+import { ThemeProvider } from "@/app/components/ThemeProvider"
+
+gsap.registerPlugin(useGSAP)
 
 const cormorant = Cormorant_Garamond({
   variable: "--font-cormorant",
@@ -27,11 +31,18 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={`${cormorant.variable} ${dmSans.variable} antialiased`}>
-        <Header />
-        {children}
-        <Footer />
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: intentional FOUC prevention
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('kalos-theme');var d=t==='dark'||((!t||t==='system')&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}})()`,
+          }}
+        />
+        <title></title>
+      </head>
+      <body className={`${cormorant.variable} ${dmSans.variable} antialiased h-dvh w-dvw overflow-hidden`}>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   )
